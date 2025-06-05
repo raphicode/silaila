@@ -22,45 +22,6 @@
     <?php
         include "functions.php";
         include "navbar.php";
-        $tanggal_hari_ini = date('Y-m-d');
-        date_default_timezone_set('Asia/Jakarta');
-        $hari_ini = date('Y-m-d');
-
-        // Ambil 1 petugas yang sudah presensi 'Masuk' hari ini
-        $query_petugas = mysqli_query($koneksi, "SELECT p.nip, u.nama, p.waktu AS waktu_masuk, ( SELECT MAX(waktu) FROM presensi_petugas WHERE nip = p.nip AND jenis = 'Keluar' AND DATE(waktu) = '$hari_ini') AS waktu_keluar FROM presensi_petugas p 
-        JOIN login u ON p.nip = u.nip 
-        WHERE DATE(p.waktu) = '$hari_ini' 
-            AND p.jenis = 'Masuk' 
-        ORDER BY p.waktu DESC 
-        LIMIT 1");
-
-        $nama_petugas = '';
-        $nip_petugas = '';
-
-        $petugas = mysqli_fetch_assoc($query_petugas);
-        if ($petugas) {
-            $waktu_masuk = $petugas['waktu_masuk'];
-            $waktu_keluar = $petugas['waktu_keluar'];
-            if ($waktu_keluar && $waktu_keluar > $waktu_masuk) {
-                $nip_petugas = '';
-                $nama_petugas = '';
-            } else {
-                $nip_petugas = $petugas['nip'] ?? '';
-                $nama_petugas = $petugas['nama'] ?? '';
-            }
-        }
-        // Konfigurasi paginasi
-        $limit = 10;
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $offset = ($page - 1) * $limit;
-
-        // Ambil total data
-        $total_query = $koneksi->query("SELECT COUNT(*) AS total FROM pengunjung");
-        $total_data = $total_query->fetch_assoc()['total'];
-        $total_page = ceil($total_data / $limit);
-
-        // Ambil data sesuai halaman
-        $pengunjung = $koneksi->query("SELECT * FROM pengunjung ORDER BY user_id DESC LIMIT $limit OFFSET $offset");
     ?>
     <div class="w-full">
         <!-- Bagian Buku Tamu -->
@@ -287,33 +248,29 @@
     <?php
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            if (tambah($_POST) > 0) {
-                // Cek media layanan
-                $media_layanan = $_POST['media_layanan'];
+            $hasil = cekMediaTamu($_POST, $koneksi);
 
-                if ($media_layanan === "Kunjungan Langsung") {
-                    // Ambil nomor antrian terakhir
-                    $query = "SELECT nomor_antrian FROM pengunjung WHERE DATE(time) = '$tanggal_hari_ini' ORDER BY time DESC LIMIT 1";
-                    $result = mysqli_query($koneksi, $query);
-                    $row = mysqli_fetch_assoc($result);
-                    $nomor_antrian = $row['nomor_antrian'];
-
+            if ($hasil['status'] === 'success') {
+                if ($hasil['type'] === 'antrian') {
+                    // Nomor antrian disiapkan untuk JavaScript
+                    $nomor_antrian = $hasil['nomor'];
                     echo "<script>
                         document.addEventListener('DOMContentLoaded', function() {
-                            showAntrianModal('$nomor_antrian');
+                            document.getElementById('nomorAntrian').textContent = '$nomor_antrian';
+                            document.getElementById('antrianModal').classList.remove('hidden');
+                            document.getElementById('antrianModal').classList.add('flex');
                         });
                     </script>";
                 } else {
-                    // Tidak menampilkan nomor antrian
                     echo "<script>
                         document.addEventListener('DOMContentLoaded', function() {
-                            showBerhasilTambahModal();
+                            document.getElementById('berhasilTambahModal').classList.remove('hidden');
+                            document.getElementById('berhasilTambahModal').classList.add('flex');
                         });
                     </script>";
                 }
-
             } else {
-                echo "<script>alert('Gagal menambahkan data');</script>";
+                echo "<script>alert('{$hasil['message']}');</script>";
             }
         }
     ?>

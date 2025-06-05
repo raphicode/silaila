@@ -730,10 +730,6 @@ video {
   margin-right: 0.75rem;
 }
 
-.mr-6 {
-  margin-right: 1.5rem;
-}
-
 .mt-0 {
   margin-top: 0px;
 }
@@ -869,10 +865,6 @@ video {
 
 .max-w-md {
   max-width: 28rem;
-}
-
-.flex-grow {
-  flex-grow: 1;
 }
 
 .table-auto {
@@ -1263,11 +1255,6 @@ video {
   padding-right: 0.75rem;
 }
 
-.px-32 {
-  padding-left: 8rem;
-  padding-right: 8rem;
-}
-
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -1349,10 +1336,6 @@ video {
   padding-top: 0.25rem;
 }
 
-.pt-2 {
-  padding-top: 0.5rem;
-}
-
 .pt-3 {
   padding-top: 0.75rem;
 }
@@ -1375,14 +1358,6 @@ video {
 
 .text-center {
   text-align: center;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.font-inter {
-  font-family: Inter;
 }
 
 .font-mono {
@@ -1685,10 +1660,6 @@ video {
 
 .hover\:stroke-yellow-400:hover {
   stroke: #facc15;
-}
-
-.hover\:font-bold:hover {
-  font-weight: 700;
 }
 
 .hover\:text-blue-400:hover {

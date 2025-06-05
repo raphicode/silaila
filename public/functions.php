@@ -335,4 +335,78 @@
 
 		return $feedback;
 	}
+
+	function cekMediaTamu($data, $koneksi) {
+		$tanggal_hari_ini = date('Y-m-d');
+
+		if (tambah($data) > 0) {
+			$media_layanan = $data['media_layanan'];
+
+			if ($media_layanan === "Kunjungan Langsung") {
+				$query = "SELECT nomor_antrian FROM pengunjung WHERE DATE(time) = '$tanggal_hari_ini' ORDER BY time DESC LIMIT 1";
+				$result = mysqli_query($koneksi, $query);
+				$row = mysqli_fetch_assoc($result);
+				$nomor_antrian = $row['nomor_antrian'] ?? '0';
+
+				return [
+					'status' => 'success',
+					'type' => 'antrian',
+					'nomor' => $nomor_antrian
+				];
+			} else {
+				return [
+					'status' => 'success',
+					'type' => 'non-antrian'
+				];
+			}
+		} else {
+			return [
+				'status' => 'error',
+				'message' => 'Gagal menambahkan data'
+			];
+		}
+	}
+
+
+	// Kumpulan Query
+	// Bagian Form.php
+	$tanggal_hari_ini = date('Y-m-d');
+        date_default_timezone_set('Asia/Jakarta');
+        $hari_ini = date('Y-m-d');
+
+        // Ambil 1 petugas yang sudah presensi 'Masuk' hari ini
+        $query_petugas = mysqli_query($koneksi, "SELECT p.nip, u.nama, p.waktu AS waktu_masuk, ( SELECT MAX(waktu) FROM presensi_petugas WHERE nip = p.nip AND jenis = 'Keluar' AND DATE(waktu) = '$hari_ini') AS waktu_keluar FROM presensi_petugas p 
+        JOIN login u ON p.nip = u.nip 
+        WHERE DATE(p.waktu) = '$hari_ini' 
+            AND p.jenis = 'Masuk' 
+        ORDER BY p.waktu DESC 
+        LIMIT 1");
+
+        $nama_petugas = '';
+        $nip_petugas = '';
+
+        $petugas = mysqli_fetch_assoc($query_petugas);
+        if ($petugas) {
+            $waktu_masuk = $petugas['waktu_masuk'];
+            $waktu_keluar = $petugas['waktu_keluar'];
+            if ($waktu_keluar && $waktu_keluar > $waktu_masuk) {
+                $nip_petugas = '';
+                $nama_petugas = '';
+            } else {
+                $nip_petugas = $petugas['nip'] ?? '';
+                $nama_petugas = $petugas['nama'] ?? '';
+            }
+        }
+        // Konfigurasi paginasi
+        $limit = 10;
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
+
+        // Ambil total data
+        $total_query = $koneksi->query("SELECT COUNT(*) AS total FROM pengunjung");
+        $total_data = $total_query->fetch_assoc()['total'];
+        $total_page = ceil($total_data / $limit);
+
+        // Ambil data sesuai halaman
+        $pengunjung = $koneksi->query("SELECT * FROM pengunjung ORDER BY user_id DESC LIMIT $limit OFFSET $offset");
 ?>
