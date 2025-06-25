@@ -25,7 +25,7 @@
         <title>SILAILA</title>
     </head>
     <body class="bg-slate-200 bg-cover w-full overflow-hidden min-h-screen flex flex-col">
-        <nav class="w-full  text-right">
+        <nav class="w-full flex justify-end text-right p-2">
             <a class=" text-white  hover:font-bold hover:text-slate-200 rounded-lg" href="public/login.php">
                 <button class="bg-blue-900 hover:scale-105 active:scale-90 p-2 mt-4 mr-6 rounded-lg">
                     Login Admin
@@ -48,26 +48,8 @@
                 </div>    
             </div>
         </div>
-        <footer class="w-full bg-blue-900 text-center mt-0">
+        <footer class="w-full bg-blue-900 text-center mt-0 bt-0 pt-2 pb-2">
             <p class="text-slate-200">Created by Muhammad Rafidzaky Wahyudi - BPS Kabupaten Pulang Pisau</p>
         </footer>
     </body>
 </html>
-<!-- <div class="bg-backsilaila">
-            <div class="text-right">
-                <a class="btn btn-info" href="login.php" role="button" >Login Admin</a>
-            </div>
-            <div class="container text-center mt-3">
-                <img src="../img/silaila-logo.png" class="media-object" style="width=100%">  
-                <h3 class = "display-5">
-                <span class = "text-primary "> <strong> Pelayanan </strong> </span>
-                <span class = "text-success"> <strong> Statistik </strong> </span>
-                <span class = "text-warning"> <strong> Terpadu </strong> </span>
-                </h3>
-                <h4 class="text-secondary"> <strong> Selamat Datang di BPS Kabupaten Pulang Pisau </strong> </h4> <br>
-                <a href="form.php" class="btn btn-info" role="button">Masuk</a>
-            </div>
-        </div>
-        <footer class="bg-info text-center text-white mt-0 bt-0 pt-2 pb-2">
-        Created by Dina Salsabila - PST BPS Kabupaten Pulang Pisau 
-        </footer> -->

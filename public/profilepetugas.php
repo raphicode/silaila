@@ -1,4 +1,5 @@
 <?php
+    ob_start();
     session_start();
     include "sidebar.php";
     date_default_timezone_set("Asia/Jakarta");

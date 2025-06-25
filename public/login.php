@@ -5,6 +5,28 @@
         exit;
     }
     include "functions.php";
+
+    if(isset($_POST['proseslogin'])){
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        $sql = mysqli_query($koneksi, "SELECT * FROM login WHERE username = '$username' AND password = '$password'");
+
+        $cek = mysqli_num_rows($sql);
+
+        if($cek > 0) {
+            $data = mysqli_fetch_assoc($sql);
+            $_SESSION['login'] = true;
+            $_SESSION['username'] = $data['username'];
+            $_SESSION['nip'] = $data['nip'];
+            $_SESSION['nama'] = $data['nama'];
+
+            header("Location: beranda.php");
+            exit;
+        } else {
+            echo "<div class='text-center text-red-500 py-2'><b> Username dan Password Salah! </b></div>";
+        }
+    }
 ?>
 
 <!doctype html>
@@ -16,14 +38,14 @@
         <title>LOGIN SILAILA</title>
     </head>
     <body>
-        <div class="w-full min-h-screen bg-cover bg-backsilaila flex justify-center items-center">
+        <div class="w-full min-h-screen bg-slate-200 flex justify-center items-center">
             <div class="w-[25%] flex flex-col justify-center items-center">
                 <div class="">
                     <img src="../img/silaila2.png" class="w-32 h-32 object-center" alt="">
                 </div>
-                <div class="w-full shadow-lg bg-gradient-to-t from-blue-400 to-gray-100 rounded-lg my-2">
-                    <h1 class="font-bold text-center text-3xl pt-4">LOGIN SILAILA</h1>
-                    <h3 class="text-center font-semibold mb-4">Sistem Informasi Pelayanan dan Pelaporan</h3>
+                <div class="w-full shadow-lg bg-blue-600 rounded-lg my-2">
+                    <h1 class="font-bold text-center text-3xl pt-4 text-slate-200">LOGIN SILAILA</h1>
+                    <h3 class="text-center font-semibold mb-4 text-slate-200">Sistem Informasi Pelayanan dan Pelaporan</h3>
                     <form action="" method="POST">
                         <div class="relative flex items-center px-4 mb-4" id="secemail;">
                             <input type="text" id="username" name="username"
@@ -51,29 +73,6 @@
                             <button name="proseslogin" type="submit" class=" bg-yellow-400 w-[50%] py-1 rounded-md font-semibold hover:scale-105 active:scale-90 mb-4 hover:text-blue-400">Login</button>
                         </div>
                     </form>
-                    <?php
-                        if(isset($_POST['proseslogin'])){
-                            $username = $_POST['username'];
-                            $password = $_POST['password'];
-
-                            $sql = mysqli_query($koneksi, "SELECT * FROM login WHERE username = '$username' AND password = '$password'");
-
-                            $cek = mysqli_num_rows($sql);
-
-                            if($cek > 0) {
-                                $data = mysqli_fetch_assoc($sql);
-                                $_SESSION['login'] = true;
-                                $_SESSION['username'] = $data['username'];
-                                $_SESSION['nip'] = $data['nip'];
-                                $_SESSION['nama'] = $data['nama'];
-
-                                header("Location: beranda.php");
-                                exit;
-                            } else {
-                                echo "<div class='text-center text-red-500 py-2'><b> Username dan Password Salah! </b></div>";
-                            }
-                        }
-                    ?>
                 </div>
             </div>
         </div> 

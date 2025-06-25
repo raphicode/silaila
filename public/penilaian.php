@@ -109,7 +109,7 @@
                             <div class="rounded-lg px-4 w-full bg-white border border-blue-900 mb-2 flex justify-between items-center">
                                 <input type="hidden" name="kepuasan" id="kepuasan">
                                 <p id="rating-value" class="text-gray-600">Rating: 0</p>
-                                <div id="rating-container" class="flex gap-1 bg-slate-50 text-3xl text-gray-300 pb-[4px]">
+                                <div id="rating-container" class="flex gap-1 text-3xl text-gray-300 pb-[4px]">
                                     <span class="star cursor-pointer" data-value="1">★</span>
                                     <span class="star cursor-pointer" data-value="2">★</span>
                                     <span class="star cursor-pointer" data-value="3">★</span>
