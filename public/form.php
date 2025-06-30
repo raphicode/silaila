@@ -5,23 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="css/style.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="icon" href="../img/silaila2.png" type="image/png">
     <title>SILAILA</title>
-    <!-- <script>
-        function showToast() {
-            const toast = document.getElementById("toast");
-            toast.style.display = "block";
-            setTimeout(() => {
-                toast.style.display = "none";
-            }, 1000);
-        }
-    </script> -->
-</script>
 </head>
 <body class="bg-slate-200 bg-cover overflow-x-hidden ">
     <?php
         include "functions.php";
         include "navbar.php";
+        $tanggal_hari_ini = date('Y-m-d');
+        date_default_timezone_set('Asia/Jakarta');
+        $hari_ini = date('Y-m-d');
+
+        // Ambil 1 petugas yang sudah presensi 'Masuk' hari ini
+        $query_petugas = mysqli_query($koneksi, "SELECT p.nip, u.nama, p.waktu AS waktu_masuk, ( SELECT MAX(waktu) FROM presensi_petugas WHERE nip = p.nip AND jenis = 'Keluar' AND DATE(waktu) = '$hari_ini') AS waktu_keluar FROM presensi_petugas p 
+        JOIN login u ON p.nip = u.nip 
+        WHERE DATE(p.waktu) = '$hari_ini' 
+            AND p.jenis = 'Masuk' 
+        ORDER BY p.waktu DESC 
+        LIMIT 1");
+
+        $nama_petugas = '';
+        $nip_petugas = '';
+
+        $petugas = mysqli_fetch_assoc($query_petugas);
+        if ($petugas) {
+            $waktu_masuk = $petugas['waktu_masuk'];
+            $waktu_keluar = $petugas['waktu_keluar'];
+            if ($waktu_keluar && $waktu_keluar > $waktu_masuk) {
+                $nip_petugas = '';
+                $nama_petugas = '';
+            } else {
+                $nip_petugas = $petugas['nip'] ?? '';
+                $nama_petugas = $petugas['nama'] ?? '';
+            }
+        }
+        // Konfigurasi paginasi
+        $limit = 10;
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $offset = ($page - 1) * $limit;
+
+        // Ambil total data
+        $total_query = $koneksi->query("SELECT COUNT(*) AS total FROM pengunjung");
+        $total_data = $total_query->fetch_assoc()['total'];
+        $total_page = ceil($total_data / $limit);
+
+        // Ambil data sesuai halaman
+        $pengunjung = $koneksi->query("SELECT * FROM pengunjung ORDER BY user_id DESC LIMIT $limit OFFSET $offset");
     ?>
     <div class="w-full">
         <!-- Bagian Buku Tamu -->
@@ -32,12 +61,12 @@
             <div class="lg:w-[25%] w-full flex justify-center  mt-4">
                 <img src="../img/silaila2.png" alt="" class="w-[50%]">
             </div>
-            <div class=" h-full text-blue-950">
+            <div class=" h-full text-blue-950 px-2">
                 <div>
                     <h1 class="text-lg md:text-2xl text-center font-bold">
                         DAFTAR TAMU STATISTIK BPS KABUPATEN PULANG PISAU
                     </h1>
-                    <h2 class="text-sm lg:text-left text-center">
+                    <h2 class="text-sm lg:text-left text-center mb-2">
                         Sistem Informasi Pelayanan dan Pelaporan (SILAILA)
                     </h2>
                 </div>
@@ -50,40 +79,40 @@
                 </button>
             </div>
         </div>
-        <div class="my-2 pt-4 pb-4 px-8 flex justify-center">
-            <div class="shadow-lg overflow-hidden rounded-b-lg">
+        <div class="my-2 pt-4 pb-4 px-8 flex justify-center w-full">
+            <div class="shadow-lg rounded-b-lg w-full">
                 <table class="w-full shadow-lg" border="1" cellpadding="10" cellspacing="0" id="userTable">
                     <thead>
                         <tr class="text-xs text-center bg-white leading-4 font-bold text-black uppercase tracking-wider">
-                            <th class="h-[50px] px-6 py-3 border-b rounded-tl-lg border-gray-200 text-center">Nama</th>
-                            <th class="h-[50px] px-6 py-3 border-b hidden lg:table-cell border-gray-200 text-center">Jenis Kelamin</th>
-                            <th class="h-[50px] px-6 py-3 border-b border-gray-200 text-center">Instansi</th>
-                            <th class="h-[50px] px-6 py-3 border-b hidden lg:table-cell border-gray-200  text-center">Media Layanan</th>
-                            <th class="h-[50px] px-6 py-3 border-b rounded-tr-lg border-gray-200 text-center">Waktu Berkunjung</th>
+                            <th class="h-[50px] px-2 md:px-6 py-3 border-b rounded-tl-lg border-gray-200 text-center">Nama</th>
+                            <th class="h-[50px] px-2 md:px-6 py-3 border-b hidden lg:table-cell border-gray-200 text-center">Jenis Kelamin</th>
+                            <th class="h-[50px] px-2 md:px-6 py-3 border-b border-gray-200 text-center">Instansi</th>
+                            <th class="h-[50px] px-2 md:px-6 py-3 border-b hidden lg:table-cell border-gray-200  text-center">Media Layanan</th>
+                            <th class="h-[50px] px-2 md:px-6 py-3 border-b rounded-tr-lg border-gray-200 text-center">Waktu Berkunjung</th>
                         </tr>
                     </thead>
                     <tbody class="text-black bg-white">
                         <?php foreach ($pengunjung as $tamu) : ?>
                             <tr class="rounded-b-lg">
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                <td class="px-2 md:px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                     <div class="block">
                                         <div class="text-sm leading-5 font-medium"><?= ucwords(strtolower(htmlspecialchars($tamu["nama"]))); ?></div>
                                     </div>
                                 </td>
                                 
-                                <td class="px-6 py-4 whitespace-no-wrap hidden lg:table-cell border-b border-gray-200">
+                                <td class="px-2 md:px-6 py-4 whitespace-no-wrap hidden lg:table-cell border-b border-gray-200">
                                     <div class="text-sm leading-5"><?= $tamu["jenis_kelamin"]; ?></div>
                                 </td>
                                 
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                <td class="px-2 md:px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                     <div class="text-sm leading-5"><?= strtoupper(htmlspecialchars($tamu["instansi"])); ?></div>
                                 </td>
 
-                                <td class="px-6 py-4 hidden lg:table-cell whitespace-no-wrap border-b border-gray-200">
+                                <td class="px-2 md:px-6 py-4 hidden lg:table-cell whitespace-no-wrap border-b border-gray-200">
                                     <div class="text-sm leading-5"><?= $tamu["media_layanan"]; ?></div>
                                 </td>
 
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5" >
+                                <td class="px-2 md:px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5" >
                                     <div class="text-sm leading-5"><?= $tamu["time"]; ?></div>
                                 </td>
                             </tr>
@@ -125,7 +154,7 @@
 
     <!-- Modal -->
     <div id="modalForm" class="hidden fixed inset-0 z-50 backdrop-blur-sm bg-black/30">
-        <div id="modalContent" class="bg-white w-[75%] lg:w-[50%]  rounded-lg shadow-lg p-4 relative transform transition-all duration-300 scale-95">
+        <div id="modalContent" class="bg-white w-[75%] lg:w-[50%] max-h-screen overflow-y-auto rounded-lg shadow-lg p-4 relative scale-95">
             <button onclick="closeModal()" class="absolute top-2 right-4 text-xl font-bold text-blue-800">×</button>
             <h2 class="text-xl font-bold text-blue-900 text-center mb-4">Form Tambah Tamu</h2>
             <form method="post" onsubmit="return validatePhoneNumber()">
@@ -248,29 +277,33 @@
     <?php
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $hasil = cekMediaTamu($_POST, $koneksi);
+            if (tambah($_POST) > 0) {
+                // Cek media layanan
+                $media_layanan = $_POST['media_layanan'];
 
-            if ($hasil['status'] === 'success') {
-                if ($hasil['type'] === 'antrian') {
-                    // Nomor antrian disiapkan untuk JavaScript
-                    $nomor_antrian = $hasil['nomor'];
+                if ($media_layanan === "Kunjungan Langsung") {
+                    // Ambil nomor antrian terakhir
+                    $query = "SELECT nomor_antrian FROM pengunjung WHERE DATE(time) = '$tanggal_hari_ini' ORDER BY time DESC LIMIT 1";
+                    $result = mysqli_query($koneksi, $query);
+                    $row = mysqli_fetch_assoc($result);
+                    $nomor_antrian = $row['nomor_antrian'];
+
                     echo "<script>
                         document.addEventListener('DOMContentLoaded', function() {
-                            document.getElementById('nomorAntrian').textContent = '$nomor_antrian';
-                            document.getElementById('antrianModal').classList.remove('hidden');
-                            document.getElementById('antrianModal').classList.add('flex');
+                            showAntrianModal('$nomor_antrian');
                         });
                     </script>";
                 } else {
+                    // Tidak menampilkan nomor antrian
                     echo "<script>
                         document.addEventListener('DOMContentLoaded', function() {
-                            document.getElementById('berhasilTambahModal').classList.remove('hidden');
-                            document.getElementById('berhasilTambahModal').classList.add('flex');
+                            showBerhasilTambahModal();
                         });
                     </script>";
                 }
+
             } else {
-                echo "<script>alert('{$hasil['message']}');</script>";
+                echo "<script>alert('Gagal menambahkan data');</script>";
             }
         }
     ?>
