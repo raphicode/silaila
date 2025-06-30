@@ -360,30 +360,30 @@
         <div id="modalContentDetailTamu" class="bg-white w-[50%] sm:w-[50%] rounded-lg shadow-lg p-4 relative transform transition-all duration-300 scale-95">
             <button onclick="closeModalTamu()" class="absolute top-2 right-4 text-xl font-bold text-blue-800">×</button>
             <h2 class="text-xl font-bold text-blue-900 text-center mb-4">Detail Tamu</h2>
-                <label class="block text-blue-900 font-semibold mb-1">Nama Lengkap</label>
-                <input type="text" name="nama" disabled class="w-full mb-2 p-2 border rounded">
+            <label class="block text-blue-900 font-semibold mb-1">Nama Lengkap</label>
+            <input type="text" name="nama" disabled class="w-full mb-2 p-2 border rounded">
 
-                <label class="block text-blue-900 font-semibold mb-1">Jenis Kelamin</label>
-                <input type="text" name="jenis_kelamin" disabled class="w-full mb-2 p-2 border rounded">
+            <label class="block text-blue-900 font-semibold mb-1">Jenis Kelamin</label>
+            <input type="text" name="jenis_kelamin" disabled class="w-full mb-2 p-2 border rounded">
 
-                <label class="block text-blue-900 font-semibold mb-1">Instansi</label>
-                <input type="text" name="instansi" disabled class="w-full mb-2 p-2 border rounded">
+            <label class="block text-blue-900 font-semibold mb-1">Instansi</label>
+            <input type="text" name="instansi" disabled class="w-full mb-2 p-2 border rounded">
 
-                <label class="block text-blue-900 font-semibold mb-1">Email</label>
-                <input type="email" name="email" disabled class="w-full mb-2 p-2 border rounded">
+            <label class="block text-blue-900 font-semibold mb-1">Email</label>
+            <input type="email" name="email" disabled class="w-full mb-2 p-2 border rounded">
 
-                <label class="block text-blue-900 font-semibold mb-1">Nomor HP</label>
-                <input type="text" name="no_hp" disabled class="w-full mb-2 p-2 border rounded">
+            <label class="block text-blue-900 font-semibold mb-1">Nomor HP</label>
+            <input type="text" name="no_hp" disabled class="w-full mb-2 p-2 border rounded">
 
-                <label class="block text-blue-900 font-semibold mb-1">Media Layanan</label>
-                <input type="text" name="media_layanan" disabled class="w-full mb-2 p-2 border rounded">
+            <label class="block text-blue-900 font-semibold mb-1">Media Layanan</label>
+            <input type="text" name="media_layanan" disabled class="w-full mb-2 p-2 border rounded">
 
-                <label class="block text-blue-900 font-semibold mb-1">Keperluan</label>
-                <input type="text" name="keperluan" disabled class="w-full mb-2 p-2 border rounded">
+            <label class="block text-blue-900 font-semibold mb-1">Keperluan</label>
+            <input type="text" name="keperluan" disabled class="w-full mb-2 p-2 border rounded">
 
-                <label class="block text-blue-900 font-semibold mb-1">Rincian Keperluan</label>
-                <input type="text" name="rincian_keperluan" disabled class="w-full mb-2 p-2 border rounded">
-            </div>
+            <label class="block text-blue-900 font-semibold mb-1">Rincian Keperluan</label>
+            <input type="text" name="rincian_keperluan" disabled class="w-full mb-2 p-2 border rounded">
+        </div>
     </div>
 
     <script>
