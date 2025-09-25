@@ -31,11 +31,9 @@
     	$waktu_sekarang = date('Y-m-d H:i:s'); // waktu sekarang untuk kolom time
     
     	$nomor_antrian = null;
-    	if ($media_layanan === "Kunjungan Langsung") {
-    		$result = mysqli_query($koneksi, "SELECT COUNT(*) AS jumlah FROM pengunjung WHERE DATE(time) = CURDATE() AND media_layanan = 'Kunjungan Langsung'");
-    		$row = mysqli_fetch_assoc($result);
-    		$nomor_antrian = ($row && isset($row['jumlah'])) ? $row['jumlah'] + 1 : 1;
-    	}
+		$result = mysqli_query($koneksi, "SELECT COUNT(*) AS jumlah FROM pengunjung WHERE DATE(time) = CURDATE()");
+		$row = mysqli_fetch_assoc($result);
+		$nomor_antrian = ($row && isset($row['jumlah'])) ? $row['jumlah'] + 1 : 1;
     
     	$nip_petugas = !empty($data["nip_petugas"]) ? htmlspecialchars($data["nip_petugas"]) : null;
     	$nama_petugas = null;

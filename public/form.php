@@ -266,10 +266,8 @@
         }
     </script>
 
-    
-
     <div id="antrianModal" class="hidden fixed inset-0 z-50 bg-black/60 items-center justify-center">
-        <div class="bg-white rounded-lg shadow-lg p-8 text-center w-[300px]">
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center w-[25%]">
             <h2 class="text-xl font-bold text-blue-900 mb-4">Nomor Antrian Anda</h2>
             <div id="nomorAntrian" class="text-6xl font-bold text-red-600"></div>
             <button onclick="closeAntrianModal()" class="mt-6 bg-blue-900 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">Tutup</button>
@@ -277,7 +275,7 @@
     </div>
 
     <div id="berhasilTambahModal" class="hidden fixed inset-0 z-50 bg-black/60 items-center justify-center">
-        <div class="bg-white rounded-lg shadow-lg p-8 text-center w-[300px]">
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center w-[25%]">
             <h2 class="text-xl font-bold text-blue-900 mb-4">Data Anda Berhasil Ditambahkan!</h2>
             <button onclick="closeBerhasilTambahModal()" class="mt-6 bg-blue-900 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">Tutup</button>
         </div>
@@ -286,30 +284,18 @@
     <?php
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            if (tambah($_POST) > 0) {
-                // Cek media layanan
-                $media_layanan = $_POST['media_layanan'];
+            if (tambah($_POST) > 0) {                
+                // Ambil nomor antrian terakhir
+                $query = "SELECT nomor_antrian FROM pengunjung WHERE DATE(time) = CURDATE() ORDER BY time DESC LIMIT 1";
+                $result = mysqli_query($koneksi, $query);
+                $row = mysqli_fetch_assoc($result);
+                $nomor_antrian = $row['nomor_antrian'];
 
-                if ($media_layanan === "Kunjungan Langsung") {
-                    // Ambil nomor antrian terakhir
-                    $query = "SELECT nomor_antrian FROM pengunjung WHERE DATE(time) = CURDATE() ORDER BY time DESC LIMIT 1";
-                    $result = mysqli_query($koneksi, $query);
-                    $row = mysqli_fetch_assoc($result);
-                    $nomor_antrian = $row['nomor_antrian'];
-
-                    echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showAntrianModal('$nomor_antrian');
-                        });
-                    </script>";
-                } else {
-                    // Tidak menampilkan nomor antrian
-                    echo "<script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            showBerhasilTambahModal();
-                        });
-                    </script>";
-                }
+                echo "<script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        showAntrianModal('$nomor_antrian');
+                    });
+                </script>";
 
             } else {
                 echo "<script>alert('Gagal menambahkan data');</script>";
