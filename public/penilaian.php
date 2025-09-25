@@ -4,33 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="../img/silaila2.png" type="image/png">
     <title>Penilaian Layanan</title>
-    <script>
-        function showToast() {
-            const toast = document.getElementById("toast");
-            toast.style.display = "block";
-            setTimeout(() => {
-                toast.style.display = "none";
-            }, 1000);
-        }
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-slate-200 bg-cover">
     <?php
         include "functions.php";
         include "navbar.php";
-        if( isset($_POST["nilai"]) ) {
-            if( penilaian($_POST) > 0 ) {
-                echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        showToast();
-                    });
-                </script>";
-            } else {
-                echo "Data gagal ditambahkan";
-            }
-        };
-
         date_default_timezone_set('Asia/Jakarta');
         $hari_ini = date('Y-m-d');
         $nama_petugas = '';
@@ -57,15 +38,15 @@
             }
         }
     ?>
-    <div class="w-full">
+    <div class="w-full p-4">
         <div id="toast" class="hidden fixed top-5 right-5 bg-white text-blue-900 font-semibold px-4 py-2 rounded-lg shadow-lg z-50 transition duration-300 ease-in-out">
             Terima Kasih Sudah Memberikan Kami Penilaian!
         </div>
         <!-- Bagian Form -->
-        <form action="" method="post">
+        <form id="form-penilaian" method="post">
             <div class="w-full flex item-center justify-center">
                 <div class="w-full flex item-center justify-center">
-                    <div class="w-[75%] lg:w-[50%] bg-white rounded-lg my-2 px-4 py-2 shadow-lg">
+                    <div class="w-full lg:w-[50%] bg-white rounded-lg my-2 px-4 py-2 shadow-lg">
                         <div class="flex justify-center items-center p-2">
                             <img src="../img/silaila2.png" width="150" alt="">
                         </div>
@@ -127,7 +108,7 @@
                             </div>
                         </div>
                         <div class="w-full text-center mb-2 pt-[16px]">
-                            <button type="submit" name="nilai" class="bg-blue-900 w-full rounded-lg font-semibold text-lg px-2 py-[2px] hover:contrast-150 active:scale-[98%] text-slate-200">
+                            <button type="submit" id="kirimButton" class="bg-blue-900 w-full rounded-lg font-semibold text-lg px-2 py-[2px] hover:contrast-150 active:scale-[98%] text-slate-200">
                                 Kirim
                             </button>
                         </div>
@@ -135,21 +116,53 @@
                 </div>
             </div>
         </form>
+        <script>
+            document.getElementById("form-penilaian").addEventListener("submit", function(e) {
+                e.preventDefault(); // Cegah submit default
+            
+                const form = e.target;
+                const formData = new FormData(form);
+                const kepuasan = document.getElementById("kepuasan").value;
+            
+                // Validasi bintang
+                if (kepuasan === "" || kepuasan === "0") {
+                    Swal.fire('Oops!', 'Mohon berikan penilaian dengan memilih minimal 1 bintang.', 'warning');
+                    return;
+                }
+            
+                // Kirim form ke server
+                fetch("submit_penilaian.php", {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) {
+                        Swal.fire({
+                            title: 'Terima kasih!',
+                            text: 'Penilaian Anda berhasil dikirim.',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            timer: 3000,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = "../index.php";
+                        });
+                    } else {
+                        throw new Error('Gagal mengirim data');
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Gagal', 'Terjadi kesalahan saat mengirim data.', 'error');
+                    console.error(error);
+                });
+            });
+        </script>
+
     </div>
     
 </body>
 <!-- Script untuk rating -->
 <script>
-    const form = document.querySelector("form");
-    const kepuasanInput = document.getElementById("kepuasan");
-
-    form.addEventListener("submit", function(event) {
-        if (kepuasanInput.value === "" || kepuasanInput.value === "0") {
-            event.preventDefault();
-            alert("Mohon berikan penilaian dengan memilih bintang minimal 1.");
-        }
-    });
-
     const stars = document.querySelectorAll(".star");
     const ratingValue = document.getElementById("rating-value");
     let savedRating = 0; // Menyimpan nilai rating yang sudah dipilih

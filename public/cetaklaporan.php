@@ -161,7 +161,7 @@ $queryPengunjungBaru = mysqli_query($koneksi, "
                     WHERE rn = 1
                     ORDER BY time ASC;
 ");
-
+$htmlUniqueVisitor = "";
 $htmlUniqueVisitor .= "<h2 style='text-align:center;'>Pengunjung Baru untuk Survei Kepuasan Data (SKD)</h2>
 <h4 style='text-align:center;'>Bulan: $bulanNama $tahun</h4>
 <hr>

@@ -11,6 +11,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="../img/silaila2.png" type="image/png">
     <title>Beranda Admin</title>
 </head>
 <body class="flex">
@@ -287,11 +288,16 @@
         });
     </script>
     <script>
-        const labels = <?php echo json_encode($tanggal); ?>;
-        const data = <?php echo json_encode($jumlah); ?>;
-        const dataOnline = <?php echo json_encode($jumlah_online); ?>;
-        const dataOffline = <?php echo json_encode($jumlah_offline); ?>;
-
+        const labelsAll = <?php echo json_encode($tanggal); ?>;
+        const dataAll = <?php echo json_encode($jumlah); ?>;
+        const dataOnlineAll = <?php echo json_encode($jumlah_online); ?>;
+        const dataOfflineAll = <?php echo json_encode($jumlah_offline); ?>;
+        
+        const labels = labelsAll.slice(-20);
+        const data = dataAll.slice(-20);
+        const dataOnline = dataOnlineAll.slice(-20);
+        const dataOffline = dataOfflineAll.slice(-20);
+        
         const ctx2 = document.getElementById('line').getContext('2d');
         new Chart(ctx2, {
             type: 'line',
@@ -322,31 +328,36 @@
                         fill: true,
                         tension: 0.4
                     },
-            ]
+                ]
             },
             options: {
-            responsive: true,
-            scales: {
-                x: {
-                    title: { display: true, text: 'Tanggal' },
-                    ticks: {
-                        maxRotation: 90,
-                        minRotation: 45
+                responsive: true,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Tanggal' },
+                        ticks: {
+                            maxRotation: 90,
+                            minRotation: 45
+                        },
+                        grid: {
+                            display: false
+                        }
                     },
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    title: { display: true, text: 'Jumlah Pengunjung' },
-                    beginAtZero: true,
-                    grid: {
-                        display: false
+                    y: {
+                        title: { display: true, text: 'Jumlah Pengunjung' },
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            stepSize: 1
+                        },
+                        grid: {
+                            display: false
+                        }
                     }
                 }
             }
-            }
         });
+
     </script>
 </body>
 </html>

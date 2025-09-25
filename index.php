@@ -22,9 +22,10 @@
         <link href="https://fonts.cdnfonts.com/css/hvdtrial-brandon-grotesque" rel="stylesheet" />
         <!-- {{-- Font Style Frutiger --}} -->
         <link href="https://fonts.cdnfonts.com/css/frutiger" rel="stylesheet" />
+        <link rel="icon" href="img/silaila2.png" type="image/png">
         <title>SILAILA</title>
     </head>
-    <body class="bg-slate-200 bg-cover w-full overflow-hidden min-h-screen flex flex-col">
+    <body class="bg-slate-200 bg-cover w-full overflow-hidden h-screen flex flex-col">
         <nav class="w-full flex justify-end text-right p-2">
             <a class=" text-white  hover:font-bold hover:text-slate-200 rounded-lg" href="public/login.php">
                 <button class="bg-blue-900 hover:scale-105 active:scale-90 p-2 mt-4 mr-6 rounded-lg">

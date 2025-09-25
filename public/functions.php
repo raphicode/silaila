@@ -1,7 +1,9 @@
 <?php
 	//buat koneksi database
 	$koneksi = mysqli_connect("localhost", "root", "", "db_silaila");
-	
+    date_default_timezone_set('Asia/Jakarta');
+    mysqli_query($koneksi, "SET time_zone = '+07:00'");
+
 	function query($query) {
 		global $koneksi;
 		$result = mysqli_query($koneksi, $query);
@@ -13,63 +15,64 @@
 	}
 
 	function tambah($data) {
-		global $koneksi;
+    	global $koneksi;
+    	date_default_timezone_set('Asia/Jakarta');
+    
+    	$nama = ($data['nama']);
+    	$jenis_kelamin = ($data['jenis_kelamin']);
+    	$instansi =($data['instansi']);
+    	$email = ($data['email']);
+    	$no_hp = ($data['no_hp']);
+    	$media_layanan = ($data['media_layanan']);
+    	$keperluan = ($data['keperluan']);
+    	$rincian_keperluan = ($data['rincian_keperluan']);
+    
+    	$tanggal_hari_ini = date('Y-m-d');
+    	$waktu_sekarang = date('Y-m-d H:i:s'); // waktu sekarang untuk kolom time
+    
+    	$nomor_antrian = null;
+    	if ($media_layanan === "Kunjungan Langsung") {
+    		$result = mysqli_query($koneksi, "SELECT COUNT(*) AS jumlah FROM pengunjung WHERE DATE(time) = CURDATE() AND media_layanan = 'Kunjungan Langsung'");
+    		$row = mysqli_fetch_assoc($result);
+    		$nomor_antrian = ($row && isset($row['jumlah'])) ? $row['jumlah'] + 1 : 1;
+    	}
+    
+    	$nip_petugas = !empty($data["nip_petugas"]) ? htmlspecialchars($data["nip_petugas"]) : null;
+    	$nama_petugas = null;
+    
+    	$stmt = $koneksi->prepare("INSERT INTO pengunjung 
+    		(nama, jenis_kelamin, instansi, email, no_hp, media_layanan, keperluan, rincian_keperluan, nomor_antrian, nip_petugas, nama_petugas, time) 
+    		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    
+    	if (!$stmt) {
+    		echo "Prepare failed: " . $koneksi->error;
+    		return 0;
+    	}
+    
+    	$stmt->bind_param(
+    		"ssssssssisss", 
+    		$nama, 
+    		$jenis_kelamin, 
+    		$instansi, 
+    		$email, 
+    		$no_hp, 
+    		$media_layanan, 
+    		$keperluan, 
+    		$rincian_keperluan,
+    		$nomor_antrian, 
+    		$nip_petugas,
+    		$nama_petugas,
+    		$waktu_sekarang
+    	);
+    
+    	if ($stmt->execute()) {
+    		return $stmt->affected_rows;
+    	} else {
+    		echo "Execute failed: " . $stmt->error;
+    		return 0;
+    	}
+    }
 
-		$nama = htmlspecialchars($data['nama']);
-		$jenis_kelamin = htmlspecialchars($data['jenis_kelamin']);
-		$instansi = htmlspecialchars($data['instansi']);
-		$email = htmlspecialchars($data['email']);
-		$no_hp = htmlspecialchars($data['no_hp']);
-		$media_layanan = htmlspecialchars($data['media_layanan']);
-		$keperluan = htmlspecialchars($data['keperluan']);
-		$rincian_keperluan = htmlspecialchars($data['rincian_keperluan']);
-
-		$tanggal_hari_ini = date('Y-m-d');
-
-		$nomor_antrian = null;
-		if ($media_layanan === "Kunjungan Langsung") {
-			$result = mysqli_query($koneksi, "SELECT COUNT(*) AS jumlah FROM pengunjung WHERE DATE(time) = '$tanggal_hari_ini' AND media_layanan = 'Kunjungan Langsung'");
-			$row = mysqli_fetch_assoc($result);
-			$nomor_antrian = ($row && isset($row['jumlah'])) ? $row['jumlah'] + 1 : 1;
-		}
-
-		$nip_petugas = !empty($data["nip_petugas"]) ? htmlspecialchars($data["nip_petugas"]) : null;
-		$nama_petugas = null;
-
-
-		$stmt = $koneksi->prepare("INSERT INTO pengunjung 
-			(nama, jenis_kelamin, instansi, email, no_hp, media_layanan, keperluan, rincian_keperluan, nomor_antrian, nip_petugas, nama_petugas) 
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-		if (!$stmt) {
-			echo "Prepare failed: " . $koneksi->error;
-			return 0;
-		}
-
-		// Bind parameter dengan tipe yang sesuai
-		$stmt->bind_param(
-			"ssssssssiss", 
-			$nama, 
-			$jenis_kelamin, 
-			$instansi, 
-			$email, 
-			$no_hp, 
-			$media_layanan, 
-			$keperluan, 
-			$rincian_keperluan,
-			$nomor_antrian, 
-			$nip_petugas,
-			$nama_petugas
-		);
-
-		if ($stmt->execute()) {
-			return $stmt->affected_rows;
-		} else {
-			echo "Execute failed: " . $stmt->error;
-			return 0;
-		}
-	}
-	
 
 	function penilaian($rate) {
 		global $koneksi;
@@ -79,10 +82,11 @@
 		$pesan = htmlspecialchars($rate["pesan"]);
 		$nip_petugas = htmlspecialchars($rate["nip_petugas"]);
 		$nama_petugas = htmlspecialchars($rate["nama_petugas"]);
+		$time = date('Y-m-d H:i:s');
 
-		$query = "INSERT INTO penilaian
-					VALUES
-				('', '$nama', '$kebutuhan', '$nilai', '$pesan', '$nip_petugas', '$nama_petugas', NULL)";
+		$query = "INSERT INTO penilaian (nama, kebutuhan, kepuasan, pesan, nip_petugas, nama_petugas, time)
+					VALUES 
+				('$nama', '$kebutuhan', '$nilai', '$pesan', '$nip_petugas', '$nama_petugas','$time')";
 		mysqli_query($koneksi, $query);
 		return mysqli_affected_rows($koneksi);
 	}
@@ -197,41 +201,47 @@
 		return query($query);
 	}
 
-	function registrasi($datapetugas) {
-		global $koneksi;
-		$nama_petugas = strtolower(stripslashes($datapetugas["nama_petugas"]));
-		$nip = strtolower(stripslashes($datapetugas["nip"]));
-		$username = strtolower(stripslashes($datapetugas["username"]));
-		$pass_petugas = mysqli_real_escape_string($koneksi, $datapetugas["pass_petugas"]);
-		$con_pass_petugas = mysqli_real_escape_string($koneksi, $datapetugas["con_pass_petugas"]);
-		$rating_rata_rata = mysqli_real_escape_string($koneksi, $datapetugas["rating_rata_rata"]);
+    function registrasi($datapetugas) {
+        global $koneksi;
+    
+        $nama_petugas = strtolower(stripslashes($datapetugas["nama_petugas"]));
+        $nip = strtolower(stripslashes($datapetugas["nip"]));
+        $username = strtolower(stripslashes($datapetugas["username"]));
+        $pass_petugas = mysqli_real_escape_string($koneksi, $datapetugas["pass_petugas"]);
+        $con_pass_petugas = mysqli_real_escape_string($koneksi, $datapetugas["con_pass_petugas"]);
+    
+        // Tangani NULL atau key yang tidak ada di rating_rata_rata
+        $rating_rata_rata = isset($datapetugas["rating_rata_rata"]) && is_numeric($datapetugas["rating_rata_rata"]) 
+                            ? $datapetugas["rating_rata_rata"] 
+                            : 0;
+    
+        $rating_rata_rata = mysqli_real_escape_string($koneksi, $rating_rata_rata);
+    
+        // Cek username sudah ada atau belum
+        $result = mysqli_query($koneksi, "SELECT * FROM login WHERE username = '$username'");
+        if(mysqli_num_rows($result) === 1) {
+            echo "<script>alert('Username sudah terdaftar!');</script>";
+            return false;
+        } 
+    
+        // Cek konfirmasi password
+        if($pass_petugas !== $con_pass_petugas){
+            echo "<script>alert('Password yang dimasukkan tidak sesuai');</script>";
+            return false;
+        }
+    
+        // Enkripsi Password
+        //$pass_petugas_hash = password_hash($pass_petugas, PASSWORD_DEFAULT);
+    
+        // Masukkan ke database
+        $query = "INSERT INTO login (nama, nip, username, password, rating_rata_rata) 
+                VALUES ('$nama_petugas', '$nip', '$username', '$pass_petugas', '$rating_rata_rata')";
+    
+        mysqli_query($koneksi, $query);
+    
+        return mysqli_affected_rows($koneksi);
+    }
 
-		$result = mysqli_query($koneksi, "SELECT * FROM login WHERE username = '$username'");
-
-		// cek username
-		if(mysqli_num_rows($result) === 1 ) {
-			echo "<script>
-				alert('Username sudah terdaftar!')
-			</script>";
-			return false; 
-		} 
-
-		if($pass_petugas !== $con_pass_petugas){
-			echo "<script>
-					alert('Password yang dimasukkan tidak sesuai')
-				</script>";
-			return false;
-		}
-
-
-		// Enkripsi Password
-		// $pass_petugas = password_hash($pass_petugas, PASSWORD_DEFAULT);
-
-		// Masukkan ke database
-		mysqli_query($koneksi, "INSERT INTO login VALUES ('$nama_petugas', '$nip', '$username', '$pass_petugas', '')");
-
-		return mysqli_affected_rows($koneksi);
-	}
 
 	function hitungDurasiPelayanan($nip) {
 		// Ambil waktu pelayanan berdasarkan NIP petugas
@@ -260,9 +270,10 @@
 		// Hitung rata-rata
 		if ($jumlah_kunjungan > 0) {
 			$rata_rata_durasi = $total_durasi / $jumlah_kunjungan;
+			$rata_rata_durasi_int = (int) $rata_rata_durasi;
 
-			$jam_rata_rata = floor($rata_rata_durasi / 3600);
-			$sisa = $rata_rata_durasi % 3600;
+			$jam_rata_rata = floor($rata_rata_durasi_int / 3600);
+			$sisa = $rata_rata_durasi_int % 3600;
 			$menit_rata_rata = floor($sisa / 60);
 			$detik_rata_rata = $sisa % 60;
 		} else {
@@ -285,7 +296,7 @@
 
 	function hitungKunjunganPetugas($nip) {
 		global $koneksi;
-
+        date_default_timezone_set('Asia/Jakarta');
 		// Hari ini
 		$layanan_harian = "SELECT COUNT(*) AS jumlah_pengunjung_harian
 			FROM pengunjung 
@@ -335,78 +346,4 @@
 
 		return $feedback;
 	}
-
-	function cekMediaTamu($data, $koneksi) {
-		$tanggal_hari_ini = date('Y-m-d');
-
-		if (tambah($data) > 0) {
-			$media_layanan = $data['media_layanan'];
-
-			if ($media_layanan === "Kunjungan Langsung") {
-				$query = "SELECT nomor_antrian FROM pengunjung WHERE DATE(time) = '$tanggal_hari_ini' ORDER BY time DESC LIMIT 1";
-				$result = mysqli_query($koneksi, $query);
-				$row = mysqli_fetch_assoc($result);
-				$nomor_antrian = $row['nomor_antrian'] ?? '0';
-
-				return [
-					'status' => 'success',
-					'type' => 'antrian',
-					'nomor' => $nomor_antrian
-				];
-			} else {
-				return [
-					'status' => 'success',
-					'type' => 'non-antrian'
-				];
-			}
-		} else {
-			return [
-				'status' => 'error',
-				'message' => 'Gagal menambahkan data'
-			];
-		}
-	}
-
-
-	// Kumpulan Query
-	// Bagian Form.php
-	$tanggal_hari_ini = date('Y-m-d');
-        date_default_timezone_set('Asia/Jakarta');
-        $hari_ini = date('Y-m-d');
-
-        // Ambil 1 petugas yang sudah presensi 'Masuk' hari ini
-        $query_petugas = mysqli_query($koneksi, "SELECT p.nip, u.nama, p.waktu AS waktu_masuk, ( SELECT MAX(waktu) FROM presensi_petugas WHERE nip = p.nip AND jenis = 'Keluar' AND DATE(waktu) = '$hari_ini') AS waktu_keluar FROM presensi_petugas p 
-        JOIN login u ON p.nip = u.nip 
-        WHERE DATE(p.waktu) = '$hari_ini' 
-            AND p.jenis = 'Masuk' 
-        ORDER BY p.waktu DESC 
-        LIMIT 1");
-
-        $nama_petugas = '';
-        $nip_petugas = '';
-
-        $petugas = mysqli_fetch_assoc($query_petugas);
-        if ($petugas) {
-            $waktu_masuk = $petugas['waktu_masuk'];
-            $waktu_keluar = $petugas['waktu_keluar'];
-            if ($waktu_keluar && $waktu_keluar > $waktu_masuk) {
-                $nip_petugas = '';
-                $nama_petugas = '';
-            } else {
-                $nip_petugas = $petugas['nip'] ?? '';
-                $nama_petugas = $petugas['nama'] ?? '';
-            }
-        }
-        // Konfigurasi paginasi
-        $limit = 10;
-        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-        $offset = ($page - 1) * $limit;
-
-        // Ambil total data
-        $total_query = $koneksi->query("SELECT COUNT(*) AS total FROM pengunjung");
-        $total_data = $total_query->fetch_assoc()['total'];
-        $total_page = ceil($total_data / $limit);
-
-        // Ambil data sesuai halaman
-        $pengunjung = $koneksi->query("SELECT * FROM pengunjung ORDER BY user_id DESC LIMIT $limit OFFSET $offset");
 ?>

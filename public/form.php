@@ -13,7 +13,6 @@
         include "functions.php";
         include "navbar.php";
         $tanggal_hari_ini = date('Y-m-d');
-        date_default_timezone_set('Asia/Jakarta');
         $hari_ini = date('Y-m-d');
 
         // Ambil 1 petugas yang sudah presensi 'Masuk' hari ini
@@ -64,7 +63,7 @@
             <div class=" h-full text-blue-950 px-2">
                 <div>
                     <h1 class="text-lg md:text-2xl text-center font-bold">
-                        DAFTAR TAMU STATISTIK BPS KABUPATEN PULANG PISAU
+                        DAFTAR PENGUNJUNG BPS KABUPATEN PULANG PISAU
                     </h1>
                     <h2 class="text-sm lg:text-left text-center mb-2">
                         Sistem Informasi Pelayanan dan Pelaporan (SILAILA)
@@ -156,12 +155,12 @@
     <div id="modalForm" class="hidden fixed inset-0 z-50 backdrop-blur-sm bg-black/30">
         <div id="modalContent" class="bg-white w-[75%] lg:w-[50%] max-h-screen overflow-y-auto rounded-lg shadow-lg p-4 relative scale-95">
             <button onclick="closeModal()" class="absolute top-2 right-4 text-xl font-bold text-blue-800">×</button>
-            <h2 class="text-xl font-bold text-blue-900 text-center mb-4">Form Tambah Tamu</h2>
+            <h2 class="text-xl font-bold text-blue-900 text-center mb-2">Form Tambah Tamu</h2>
             <form method="post" onsubmit="return validatePhoneNumber()">
                 <input type="hidden" name="nip_petugas" value="<?= $nip_petugas ?>">
                 <input type="hidden" name="nama_petugas" value="<?= $nama_petugas ?>"> 
                 <label class="block text-blue-900 font-semibold mb-1">Nama Lengkap</label>
-                <input type="text" name="nama" required class="w-full mb-2 p-2 border rounded">
+                <input type="text" autocomplete="off" name="nama" required class="w-full mb-2 p-2 border rounded">
 
                 <label class="block text-blue-900 font-semibold mb-1">Jenis Kelamin</label>
                 <select name="jenis_kelamin" required class="w-full mb-2 p-2 border rounded">
@@ -171,33 +170,43 @@
                 </select>
 
                 <label class="block text-blue-900 font-semibold mb-1">Instansi</label>
-                <input type="text" name="instansi" required class="w-full mb-2 p-2 border rounded">
+                <input type="text" autocomplete="off" name="instansi" required class="w-full mb-2 p-2 border rounded">
 
-                <label class="block text-blue-900 font-semibold mb-1">Email</label>
-                <input type="email" name="email" class="w-full mb-2 p-2 border rounded">
-
-                <label class="block text-blue-900 font-semibold mb-1">Nomor HP</label>
-                <input type="text" name="no_hp" id="no_hp" required placeholder="Awali dengan 08" class="w-full mb-2 p-2 border rounded">
-
-                <label class="block text-blue-900 font-semibold mb-1">Media Layanan</label>
-                <select name="media_layanan" required class="w-full mb-2 p-2 border rounded">
-                    <option value="" disabled selected>Pilih</option>
-                    <option value="Kunjungan Langsung">Kunjungan Langsung</option>
-                    <option value="Kunjungan Melalui Whatsapp">Kunjungan Melalui Whatsapp</option>
-                </select>
-
-                <label class="block text-blue-900 font-semibold mb-1">Keperluan</label>
-                <select name="keperluan" required class="w-full mb-2 p-2 border rounded">
-                    <option value="" disabled selected>Pilih</option>
-                    <option value="Konsultasi Statistik">Konsultasi Statistik/Permintaan Data</option>
-                    <option value="Rekomendasi Statistik">Rekomendasi Statistik</option>
-                    <option value="Pustaka Tercetak/Digital">Pustaka Tercetak/Digital</option>
-                    <option value="Koordinasi">Koordinasi</option>
-                    <option value="Layanan PPID">Layanan PPID</option>
-                </select>
+                <div class="lg:flex justify-between gap-2">
+                    <div class="w-full">
+                        <label class="block text-blue-900 font-semibold mb-1">Email</label>
+                        <input type="email" autocomplete="off" name="email" class="w-full mb-2 p-2 border rounded">
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-blue-900 font-semibold mb-1">Nomor HP</label>
+                        <input type="text" autocomplete="off" name="no_hp" id="no_hp" required placeholder="Awali dengan 62" class="w-full mb-2 p-2 border rounded">
+                    </div>
+                </div>
+                
+                <div class="lg:flex justify-between gap-2">
+                    <div class="w-full">
+                        <label class="block text-blue-900 font-semibold mb-1">Media Layanan</label>
+                        <select name="media_layanan" required class="w-full mb-2 p-2 border rounded">
+                            <option value="" disabled selected>Pilih</option>
+                            <option value="Kunjungan Langsung">Kunjungan Langsung</option>
+                            <option value="Kunjungan Melalui Whatsapp">Kunjungan Melalui Whatsapp</option>
+                        </select>
+                    </div>
+                    <div class="w-full">
+                        <label class="block text-blue-900 font-semibold mb-1">Keperluan</label>
+                        <select name="keperluan" required class="w-full mb-2 p-2 border rounded">
+                            <option value="" disabled selected>Pilih</option>
+                            <option value="Konsultasi Statistik">Konsultasi Statistik/Permintaan Data</option>
+                            <option value="Rekomendasi Statistik">Rekomendasi Statistik</option>
+                            <option value="Pustaka Tercetak/Digital">Pustaka Tercetak/Digital</option>
+                            <option value="Koordinasi">Koordinasi</option>
+                            <option value="Layanan PPID">Layanan PPID</option>
+                        </select>
+                    </div>
+                </div>
 
                 <label class="block text-blue-900 font-semibold mb-1">Rincian Keperluan</label>
-                <input type="text" name="rincian_keperluan" required placeholder="Tuliskan rincian keperluan anda" class="w-full mb-2 p-2 border rounded">
+                <input type="text" autocomplete="off" name="rincian_keperluan" required placeholder="Tuliskan rincian keperluan anda" class="w-full mb-2 p-2 border rounded">
 
                 <div class="text-center">
                     <button type="submit" class="bg-blue-900 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">
@@ -283,7 +292,7 @@
 
                 if ($media_layanan === "Kunjungan Langsung") {
                     // Ambil nomor antrian terakhir
-                    $query = "SELECT nomor_antrian FROM pengunjung WHERE DATE(time) = '$tanggal_hari_ini' ORDER BY time DESC LIMIT 1";
+                    $query = "SELECT nomor_antrian FROM pengunjung WHERE DATE(time) = CURDATE() ORDER BY time DESC LIMIT 1";
                     $result = mysqli_query($koneksi, $query);
                     $row = mysqli_fetch_assoc($result);
                     $nomor_antrian = $row['nomor_antrian'];

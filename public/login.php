@@ -43,7 +43,7 @@
                 <div class="">
                     <img src="../img/silaila2.png" class="w-32 h-32 object-center" alt="">
                 </div>
-                <div class="w-full shadow-lg bg-blue-600 rounded-lg my-2">
+                <div class="w-full shadow-lg bg-blue-900 rounded-lg my-2">
                     <h1 class="font-bold text-center text-3xl pt-4 text-slate-200">LOGIN SILAILA</h1>
                     <h3 class="text-center font-semibold mb-4 text-slate-200">Sistem Informasi Pelayanan dan Pelaporan</h3>
                     <form action="" method="POST">
@@ -70,7 +70,7 @@
                             </div>
                         </div>
                         <div class="mt-3  w-full text-center">
-                            <button name="proseslogin" type="submit" class=" bg-yellow-400 w-[50%] py-1 rounded-md font-semibold hover:scale-105 active:scale-90 mb-4 hover:text-blue-400">Login</button>
+                            <button name="proseslogin" type="submit" class=" bg-yellow-400 w-[50%] py-1 rounded-md font-semibold hover:scale-105 text-slate-200 active:scale-90 mb-4 hover:text-blue-400">Login</button>
                         </div>
                     </form>
                 </div>

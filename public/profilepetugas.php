@@ -52,8 +52,11 @@
                 WHERE nip_petugas = '$nip_petugas'");
             
             $data_rating = mysqli_fetch_assoc($query_rating);
-            $rata_rata = round($data_rating['rata_rata'], 2) ?? 0;
-
+        
+            // Cegah NULL masuk ke round()
+            $rata_rata_raw = $data_rating['rata_rata'] ?? 0;
+            $rata_rata = round($rata_rata_raw, 2);
+        
             $update_rating = mysqli_query($koneksi, "UPDATE login SET rating_rata_rata = '$rata_rata' 
             WHERE nip = '$nip_petugas'");
         }
@@ -157,6 +160,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="icon" href="../img/silaila2.png" type="image/png">
     <title>Profile Petugas</title>
 </head>
 
@@ -272,7 +276,9 @@
                     <?php while ($row = mysqli_fetch_assoc($pengunjung_page)): ?>
                     <tr class="border-t">
                         <td class="py-2 px-2"><?= ucwords(strtolower($row['time'])); ?></td>
-                        <td class="py-2 px-2"><?= ucwords(strtolower($row['waktu_selesai'])); ?></td>
+                        <td class="py-2 px-2">
+                            <?= !empty($row['waktu_selesai']) ? ucwords(strtolower($row['waktu_selesai'])) : '-'; ?>
+                        </td>
                         <td class="py-2 px-2"><?= ucwords(strtolower($row['nama'])); ?></td>
                         <td class="py-2 px-2"><?= $row['instansi']; ?></td>
                         <td class="py-2 px-2 text-center font-semibold"><?= $row['nomor_antrian']; ?></td>
@@ -360,30 +366,30 @@
         <div id="modalContentDetailTamu" class="bg-white w-[50%] sm:w-[50%] rounded-lg shadow-lg p-4 relative transform transition-all duration-300 scale-95">
             <button onclick="closeModalTamu()" class="absolute top-2 right-4 text-xl font-bold text-blue-800">×</button>
             <h2 class="text-xl font-bold text-blue-900 text-center mb-4">Detail Tamu</h2>
-            <label class="block text-blue-900 font-semibold mb-1">Nama Lengkap</label>
-            <input type="text" name="nama" disabled class="w-full mb-2 p-2 border rounded">
+                <label class="block text-blue-900 font-semibold mb-1">Nama Lengkap</label>
+                <input type="text" name="nama" disabled class="w-full mb-2 p-2 border rounded">
 
-            <label class="block text-blue-900 font-semibold mb-1">Jenis Kelamin</label>
-            <input type="text" name="jenis_kelamin" disabled class="w-full mb-2 p-2 border rounded">
+                <label class="block text-blue-900 font-semibold mb-1">Jenis Kelamin</label>
+                <input type="text" name="jenis_kelamin" disabled class="w-full mb-2 p-2 border rounded">
 
-            <label class="block text-blue-900 font-semibold mb-1">Instansi</label>
-            <input type="text" name="instansi" disabled class="w-full mb-2 p-2 border rounded">
+                <label class="block text-blue-900 font-semibold mb-1">Instansi</label>
+                <input type="text" name="instansi" disabled class="w-full mb-2 p-2 border rounded">
 
-            <label class="block text-blue-900 font-semibold mb-1">Email</label>
-            <input type="email" name="email" disabled class="w-full mb-2 p-2 border rounded">
+                <label class="block text-blue-900 font-semibold mb-1">Email</label>
+                <input type="email" name="email" disabled class="w-full mb-2 p-2 border rounded">
 
-            <label class="block text-blue-900 font-semibold mb-1">Nomor HP</label>
-            <input type="text" name="no_hp" disabled class="w-full mb-2 p-2 border rounded">
+                <label class="block text-blue-900 font-semibold mb-1">Nomor HP</label>
+                <input type="text" name="no_hp" disabled class="w-full mb-2 p-2 border rounded">
 
-            <label class="block text-blue-900 font-semibold mb-1">Media Layanan</label>
-            <input type="text" name="media_layanan" disabled class="w-full mb-2 p-2 border rounded">
+                <label class="block text-blue-900 font-semibold mb-1">Media Layanan</label>
+                <input type="text" name="media_layanan" disabled class="w-full mb-2 p-2 border rounded">
 
-            <label class="block text-blue-900 font-semibold mb-1">Keperluan</label>
-            <input type="text" name="keperluan" disabled class="w-full mb-2 p-2 border rounded">
+                <label class="block text-blue-900 font-semibold mb-1">Keperluan</label>
+                <input type="text" name="keperluan" disabled class="w-full mb-2 p-2 border rounded">
 
-            <label class="block text-blue-900 font-semibold mb-1">Rincian Keperluan</label>
-            <input type="text" name="rincian_keperluan" disabled class="w-full mb-2 p-2 border rounded">
-        </div>
+                <label class="block text-blue-900 font-semibold mb-1">Rincian Keperluan</label>
+                <input type="text" name="rincian_keperluan" disabled class="w-full mb-2 p-2 border rounded">
+            </div>
     </div>
 
     <script>
