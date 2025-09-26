@@ -20,7 +20,7 @@ $queryMedia = mysqli_query($koneksi, "
     GROUP BY media_layanan
 ");
 $queryLayanan = mysqli_query($koneksi, "
-    SELECT nama, instansi, keperluan, time, waktu_selesai 
+    SELECT nama, instansi, keperluan, media_layanan, time, waktu_selesai 
     FROM pengunjung
     WHERE MONTH(time) = $bulan AND YEAR(time) = $tahun 
     ORDER BY time ASC
@@ -47,6 +47,7 @@ while ($row = mysqli_fetch_assoc($queryMedia)) {
 }
 $html .= "</ul>";
 
+
 // Tabel data layanan
 $html .= "<h4>Daftar Layanan:</h4>
 <table border='1' cellpadding='5' cellspacing='0' width='100%'>
@@ -63,7 +64,12 @@ $html .= "<h4>Daftar Layanan:</h4>
 <tbody>";
 $no = 1;
 while ($row = mysqli_fetch_assoc($queryLayanan)) {
-    $html .= "<tr>
+    $style = "";
+    if ($row['media_layanan'] === "Kunjungan Melalui Whatsapp") {
+        $style = "background-color:#25D366;"; // hijau muda
+    }
+
+    $html .= "<tr style='{$style}'>
         <td>{$no}</td>
         <td>{$row['nama']}</td>
         <td>{$row['instansi']}</td>
@@ -74,7 +80,7 @@ while ($row = mysqli_fetch_assoc($queryLayanan)) {
     $no++;
 }
 $html .= "</tbody></table>";
-
+$html .="<div style='font-size: xx-small'>*Keterangan <br> Hijau = Kunjungan Melalui Whatsapp</div>";
 // Generate PDF
 $mpdf = new \Mpdf\Mpdf();
 $mpdf->WriteHTML($html);
@@ -82,20 +88,41 @@ $mpdf->WriteHTML($html);
 // Query performa petugas per bulan
 $queryPerformaPetugas = mysqli_query($koneksi, "
     SELECT 
-        l.nip, 
-        l.nama, 
-        l.rating_rata_rata,
-        COUNT(p.user_id) AS jumlah_layanan,
-        SEC_TO_TIME(SUM(TIMESTAMPDIFF(SECOND, p.time, p.waktu_selesai))) AS total_durasi,
-        SEC_TO_TIME(ROUND(AVG(TIMESTAMPDIFF(SECOND, p.time, p.waktu_selesai)))) AS rata_rata_durasi
+        l.nip,
+        l.nama,
+        COALESCE(p_stats.jumlah_layanan, 0) AS jumlah_layanan,
+        COALESCE(p_stats.total_durasi, '00:00:00') AS total_durasi,
+        COALESCE(p_stats.rata_rata_durasi, '00:00:00') AS rata_rata_durasi,
+        COALESCE(r_stats.jumlah_penilaian, 0) AS jumlah_penilaian,
+        COALESCE(r_stats.rata_rata_rating, 0) AS rata_rata_rating
     FROM login l
-    JOIN pengunjung p 
-        ON l.nip = p.nip_petugas 
-        AND MONTH(p.time) = $bulan 
+    LEFT JOIN (
+        -- Statistik layanan dari tabel pengunjung
+        SELECT 
+            p.nip_petugas,
+            COUNT(DISTINCT p.user_id) AS jumlah_layanan,
+            SEC_TO_TIME(SUM(TIMESTAMPDIFF(SECOND, p.time, p.waktu_selesai))) AS total_durasi,
+            SEC_TO_TIME(ROUND(AVG(TIMESTAMPDIFF(SECOND, p.time, p.waktu_selesai)))) AS rata_rata_durasi
+        FROM pengunjung p
+        WHERE MONTH(p.time) = $bulan
         AND YEAR(p.time) = $tahun
-        AND p.time IS NOT NULL 
-        AND p.waktu_selesai IS NOT NULL 
-    GROUP BY l.nip
+        AND p.time IS NOT NULL
+        AND p.waktu_selesai IS NOT NULL
+        GROUP BY p.nip_petugas
+    ) p_stats ON l.nip = p_stats.nip_petugas
+    LEFT JOIN (
+        -- Statistik rating dari tabel penilaian
+        SELECT 
+            pen.nip_petugas,
+            COUNT(pen.id_penilaian) AS jumlah_penilaian,
+            ROUND(AVG(pen.kepuasan), 2) AS rata_rata_rating
+        FROM penilaian pen
+        WHERE MONTH(pen.time) = $bulan
+        AND YEAR(pen.time) = $tahun
+        GROUP BY pen.nip_petugas
+    ) r_stats ON l.nip = r_stats.nip_petugas
+    WHERE p_stats.jumlah_layanan IS NOT NULL
+    ORDER BY l.nama;
 ");
 
 // Tambah halaman performa petugas
@@ -129,7 +156,7 @@ while ($row = mysqli_fetch_assoc($queryPerformaPetugas)) {
         <td>{$row['jumlah_layanan']}</td>
         <td>{$row['total_durasi']}</td>
         <td>{$row['rata_rata_durasi']}</td>
-        <td>{$row['rating_rata_rata']}</td>
+        <td>{$row['rata_rata_rating']}</td>
     </tr>";
     $no++;
 }

@@ -15,60 +15,60 @@
 	}
 
 	function tambah($data) {
-    	global $koneksi;
-    	date_default_timezone_set('Asia/Jakarta');
-    
-    	$nama = ($data['nama']);
-    	$jenis_kelamin = ($data['jenis_kelamin']);
-    	$instansi =($data['instansi']);
-    	$email = ($data['email']);
-    	$no_hp = ($data['no_hp']);
-    	$media_layanan = ($data['media_layanan']);
-    	$keperluan = ($data['keperluan']);
-    	$rincian_keperluan = ($data['rincian_keperluan']);
-    
-    	$tanggal_hari_ini = date('Y-m-d');
-    	$waktu_sekarang = date('Y-m-d H:i:s'); // waktu sekarang untuk kolom time
-    
-    	$nomor_antrian = null;
+		global $koneksi;
+		date_default_timezone_set('Asia/Jakarta');
+	
+		$nama = ($data['nama']);
+		$jenis_kelamin = ($data['jenis_kelamin']);
+		$instansi =($data['instansi']);
+		$email = ($data['email']);
+		$no_hp = ($data['no_hp']);
+		$media_layanan = ($data['media_layanan']);
+		$keperluan = ($data['keperluan']);
+		$rincian_keperluan = ($data['rincian_keperluan']);
+	
+		$tanggal_hari_ini = date('Y-m-d');
+		$waktu_sekarang = date('Y-m-d H:i:s'); // waktu sekarang untuk kolom time
+	
+		$nomor_antrian = null;
 		$result = mysqli_query($koneksi, "SELECT COUNT(*) AS jumlah FROM pengunjung WHERE DATE(time) = CURDATE()");
 		$row = mysqli_fetch_assoc($result);
 		$nomor_antrian = ($row && isset($row['jumlah'])) ? $row['jumlah'] + 1 : 1;
+	
+		$nip_petugas = !empty($data["nip_petugas"]) ? htmlspecialchars($data["nip_petugas"]) : null;
+		$nama_petugas = null;
+	
+		$stmt = $koneksi->prepare("INSERT INTO pengunjung 
+			(nama, jenis_kelamin, instansi, email, no_hp, media_layanan, keperluan, rincian_keperluan, nomor_antrian, nip_petugas, nama_petugas, time) 
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+	
+		if (!$stmt) {
+			echo "Prepare failed: " . $koneksi->error;
+			return 0;
+		}
     
-    	$nip_petugas = !empty($data["nip_petugas"]) ? htmlspecialchars($data["nip_petugas"]) : null;
-    	$nama_petugas = null;
+		$stmt->bind_param(
+			"ssssssssisss", 
+			$nama, 
+			$jenis_kelamin, 
+			$instansi, 
+			$email, 
+			$no_hp, 
+			$media_layanan, 
+			$keperluan, 
+			$rincian_keperluan,
+			$nomor_antrian, 
+			$nip_petugas,
+			$nama_petugas,
+			$waktu_sekarang
+		);
     
-    	$stmt = $koneksi->prepare("INSERT INTO pengunjung 
-    		(nama, jenis_kelamin, instansi, email, no_hp, media_layanan, keperluan, rincian_keperluan, nomor_antrian, nip_petugas, nama_petugas, time) 
-    		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    
-    	if (!$stmt) {
-    		echo "Prepare failed: " . $koneksi->error;
-    		return 0;
-    	}
-    
-    	$stmt->bind_param(
-    		"ssssssssisss", 
-    		$nama, 
-    		$jenis_kelamin, 
-    		$instansi, 
-    		$email, 
-    		$no_hp, 
-    		$media_layanan, 
-    		$keperluan, 
-    		$rincian_keperluan,
-    		$nomor_antrian, 
-    		$nip_petugas,
-    		$nama_petugas,
-    		$waktu_sekarang
-    	);
-    
-    	if ($stmt->execute()) {
-    		return $stmt->affected_rows;
-    	} else {
-    		echo "Execute failed: " . $stmt->error;
-    		return 0;
-    	}
+		if ($stmt->execute()) {
+			return $stmt->affected_rows;
+		} else {
+			echo "Execute failed: " . $stmt->error;
+			return 0;
+		}
     }
 
 

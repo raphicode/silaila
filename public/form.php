@@ -179,7 +179,7 @@
                     </div>
                     <div class="w-full">
                         <label class="block text-blue-900 font-semibold mb-1">Nomor HP</label>
-                        <input type="text" autocomplete="off" name="no_hp" id="no_hp" required placeholder="Awali dengan 62" class="w-full mb-2 p-2 border rounded">
+                        <input type="text" autocomplete="off" name="no_hp" id="no_hp" required placeholder="Awali dengan 08" class="w-full mb-2 p-2 border rounded">
                     </div>
                 </div>
                 
