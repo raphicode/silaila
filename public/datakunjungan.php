@@ -20,12 +20,66 @@
 <body>
     <?php
         include "sidebar.php";
-        $pengunjung = query("SELECT * FROM pengunjung ORDER BY time DESC");
     ?>
+
     <div class="p-6 space-y-6 w-full ml-[300px] ">
-        <form method="post" action="export.php">
-            <button class="bg-slate-400 hover:bg-slate-300 shadow-lg rounded-md p-2" type="submit" name="export">Export Data</button>
+        <form method="get" action="export.php">
+            <input type="hidden" name="bulan" value="<?= $_GET['bulan'] ?? '' ?>">
+            <input type="hidden" name="tahun" value="<?= $_GET['tahun'] ?? '' ?>">
+            <button class="bg-slate-400 hover:bg-slate-300 shadow-lg rounded-md p-2">
+                Export Data
+            </button>
         </form>
+        <?php
+            $bulan = $_GET['bulan'] ?? '';
+            $tahun = $_GET['tahun'] ?? '';
+        ?>
+
+        <form method="get" class="flex gap-2 mb-4">
+            <select name="bulan" class="p-2 rounded-md border">
+                <option value="">-- Pilih Bulan --</option>
+                <?php
+                for ($i = 1; $i <= 12; $i++) {
+                    $selected = ($bulan == $i) ? 'selected' : '';
+                    echo "<option value='$i' $selected>" . date('F', mktime(0, 0, 0, $i, 10)) . "</option>";
+                }
+                ?>
+            </select>
+
+            <select name="tahun" class="p-2 rounded-md border">
+                <option value="">-- Pilih Tahun --</option>
+                <?php
+                $tahun_sekarang = date('Y');
+                for ($t = $tahun_sekarang; $t >= $tahun_sekarang - 5; $t--) {
+                    $selected = ($tahun == $t) ? 'selected' : '';
+                    echo "<option value='$t' $selected>$t</option>";
+                }
+                ?>
+            </select>
+
+            <button type="submit" class="bg-blue-500 hover:bg-blue-400 text-white px-4 rounded-md">
+                Filter
+            </button>
+
+            <a href="datakunjungan.php" class="bg-gray-400 border hover:bg-gray-300 px-4 rounded-md flex items-center">
+                Reset
+            </a>
+        </form>
+        <?php
+            $where = [];
+
+            if (!empty($bulan)) {
+                $where[] = "MONTH(time) = '$bulan'";
+            }
+
+            if (!empty($tahun)) {
+                $where[] = "YEAR(time) = '$tahun'";
+            }
+
+            $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+            $pengunjung = query("SELECT * FROM pengunjung $where_sql ORDER BY time DESC");
+        ?>
         <div class="my-2 w-full pt-4 pb-4  sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 flex justify-center">
             <div class="">
                 <table class="w-full table-fixed border shadow-lg" style="table-layout: fixed;" border="1" cellpadding="10" cellspacing="0" id="userTable">
